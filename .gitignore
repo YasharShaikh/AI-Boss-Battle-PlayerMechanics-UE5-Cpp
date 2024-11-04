@@ -72,3 +72,6 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+#custom ignores
+AI_StateMachine_PlayerController_UnrealEngine_Cpp/Content/Assets/*

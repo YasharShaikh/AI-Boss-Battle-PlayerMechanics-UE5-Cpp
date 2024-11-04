@@ -1,0 +1,16 @@
+player character: 
+1. walk->animation----------------DONE
+2. run->animation----------------DONE
+3. jump->animation----------------DONE(MECHANIC)
+4. crouch->animation----------------DONE(MECHANIC)
+
+--------extra--------
+5. dash sideways----------------
+6. lift and throw object----------------     create interactable onbject interface then assign to liftable object actor then check from PlayerCharacter                                          
+
+
+
+Gun System
+1. spawn gun on player----------------DONE
+2. shoot gun
+3. switch mode
