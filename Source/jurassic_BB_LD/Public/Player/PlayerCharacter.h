@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -11,7 +11,6 @@
 class UAnimMontage;
 class UCameraComponent;
 class UCharacterMovementComponent;
-class AWeaponBase;
 class ADamageInflictingObject;
 class AInteractableForPlacement;
 class UStaticMeshComponent;
@@ -21,19 +20,9 @@ class USplineComponent;
 class ATrapTripWire;
 class UTripWireComponent;
 class UBoxComponent;
-
-
-
-UENUM(BlueprintType)
-enum class EEquippedWeapon : uint8
-{
-	EW_NONE = 0 UMETA(DisplayName = "NONE"),
-	EW_RIFLE = 1 UMETA(DisplayName = "RIFLE"),
-	EW_PISTOL = 2 UMETA(DisplayName = "PISTOL"),
-
-	NUM				UMETA(Hidden)
-};
-
+class USkeletalMeshComponent;
+class AWeaponPickup;
+class UWeaponSystemComponent;
 
 UCLASS()
 class JURASSIC_BB_LD_API APlayerCharacter : public ACharacter
@@ -58,9 +47,11 @@ protected:
 
 public:
 	UPROPERTY(VisibleAnywhere)		USceneComponent* objectHoldPosition;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)		bool bInteractPressed = false;
 protected:
-	UPROPERTY(VisibleAnywhere)		UCameraComponent* PlayerViewCamera;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)		UCameraComponent* PlayerViewCamera;
+	/*UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent* Mesh1P;*/
 #pragma endregion
 
 
@@ -69,7 +60,6 @@ protected:
 
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)		bool bInteractPressed = false;
 	UPROPERTY(BlueprintReadWrite) bool  isSprinting;
 	UPROPERTY(BlueprintReadWrite) bool  isCrouching;
 
@@ -93,7 +83,7 @@ private:
 	void StartCrouch();
 	void StopCrouch();
 
-	void Detector();
+	//void Detector();
 
 
 	void interactPressed();
@@ -125,13 +115,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")			float  maxPickRange;
 	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")			float pullForce;
 	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")			float pushForce;
-	// The curve that will drive the timeline
 	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")
 	UCurveFloat* DashCurve = nullptr;
 
 	UFUNCTION(BlueprintCallable)	void Telekinesis_Pull();
 	UFUNCTION(BlueprintCallable)	void Telekinesis_Push();
-	//UFUNCTION(BlueprintCallable)	void Dash();
 
 	void ResetExoCharge();
 	void DetectTelekineticObject();
@@ -141,41 +129,19 @@ private:
 
 protected:
 
-	UPROPERTY(BlueprintReadWrite) bool  isFiring;
 
-
-	UPROPERTY(EditAnywhere, Category = "Player Character | Weapon System") float  gunMaxPickRange;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Character | Weapon Setting")EEquippedWeapon EquipType = EEquippedWeapon::EW_NONE;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Character | Weapon Setting") TSubclassOf<AWeaponBase> weaponBase;
-	UPROPERTY(BlueprintReadWrite, Category = "Player Character | Weapon Setting")TEnumAsByte<EEquippedWeapon> equippedWeapon;
-	UPROPERTY(EditAnywhere, Category = "Player Character | Weapon Setting")AWeaponBase* PistolSlot;
-	UPROPERTY(EditAnywhere, Category = "Player Character | Weapon Setting")AWeaponBase* RifleSlot;
-	UPROPERTY(EditAnywhere, Category = "Player Character | Weapon Setting") UAnimMontage* AM_GetRifle;
-	UPROPERTY(EditAnywhere, Category = "Player Character | Weapon Setting") UAnimMontage* AM_GetPistol;
-	UPROPERTY(EditAnywhere, Category = "Player Character | Weapon Setting") UAnimMontage* AM_GetKnife;
-	UPROPERTY(EditAnywhere, Category = "Player Character | Weapon Setting") UAnimMontage* AM_Reload;
-
-
-
-	UFUNCTION(BlueprintCallable)	void Shoot();
-	UFUNCTION(BlueprintCallable)	void StopShoot();
-	UFUNCTION(BlueprintCallable)	void Reload();
+public:
 	UFUNCTION(BlueprintCallable)	void AimDownSight();
 	UFUNCTION(BlueprintCallable)	void StopAimDownSights();
-	UFUNCTION(BlueprintCallable)	void switchGun();
+	AActor* HitDetection();
+	void PlayMontage(UAnimMontage* Montage, FName SectionName);
+
 
 
 private:
 
 
-	UPROPERTY() AWeaponBase* weapon;
 
-	void ChangeGun(int32 weaponIndex);
-	void AttachRifle();
-	void AttachPistol();
-	void PlayMontage(UAnimMontage* Montage, FName SectionName); // helper 
-	void PlayEquipWeaponMontage(FName SectionName, EEquippedWeapon weaponType);
-	void PlayReloadWeaponMontage(FName SectionName, EEquippedWeapon weaponType);
 #pragma endregion
 
 
@@ -184,6 +150,7 @@ private:
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Character | Trap")	UTripWireComponent* tripwireComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components") UWeaponSystemComponent* WeaponSystemComponent;
 
 #pragma endregion
 
@@ -209,7 +176,7 @@ private:
 	AInteractableForPlacement* storeInteractableForPlacement;
 
 	int32 currentWeaponIndex;
-	
+
 	//Methods
 
 

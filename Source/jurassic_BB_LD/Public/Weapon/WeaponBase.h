@@ -9,17 +9,17 @@
 
 
 UENUM(BlueprintType)
-enum class EWeaponType : uint8
+enum class EWeaponTypo : uint8
 {
 	WT_PISTOL UMETA(DisplayName = "PISTOL"),
 	WT_RIFLE UMETA(DisplayName = "RIFLE")
 };
 UENUM(BlueprintType)
-enum class EFireWeaponType : uint8
+enum class EFireModo : uint8
 {
-	FWT_AUTO UMETA(DisplayName = "AUTO"),
-	FWT_SINGLE UMETA(DisplayName = "SINGLE"),
-	FWT_BURST UMETA(DisplayName = "BURST")
+	FM_AUTO UMETA(DisplayName = "AUTO"),
+	FM_SINGLE UMETA(DisplayName = "SINGLE"),
+	FM_BURST UMETA(DisplayName = "BURST")
 };
 
 #pragma region Forward Declerations
@@ -50,7 +50,7 @@ public:
 	void Visible(bool showMesh);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon | Type Setting")
-	EWeaponType WeaponType = EWeaponType::WT_PISTOL;
+	EWeaponTypo WeaponType = EWeaponTypo::WT_PISTOL;
 
 	UFUNCTION(BlueprintCallable, Category = "Handle Object state")
 	void EnterState(EPickState nextState);
@@ -79,7 +79,7 @@ protected:
 
 #pragma region Variables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon | Type Setting")
-	EFireWeaponType FireType;
+	EFireModo FireType;
 
 	//Weapons SFX/VFX
 	UPROPERTY(EditAnywhere, Category = "Weapon | VFX ") UParticleSystem* muzzleFlash;
@@ -94,8 +94,6 @@ protected:
 	FTimerHandle TimerHandle_TimeBetweenShots;
 	float LastFireTime;
 	float TimeBetweenShots;
-
-	//
 
 #pragma endregion
 

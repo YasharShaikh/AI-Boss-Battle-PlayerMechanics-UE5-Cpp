@@ -69,34 +69,34 @@ void UHuntStateComponent::UpdateState(ATrexAIController* AIController, float Del
 
 				if (bIsPlayerCharacterMoving)
 				{
-					PlayMontageOnce(ControlledCharacter, BiteFWDMontage, FName("walk_bite_front"));
+					PlayMontageOnce(ControlledCharacter, BiteFWDMontage, FName("inplace_bite_front"));
 
 
-					if (ForwardDotProduct >= CosineThreshold) // Player is directly front of AI
-					{
-						AIController->StopMovement();
-						PlayMontageOnce(ControlledCharacter, BiteFWDMontage, FName("walk_bite_front"));
-					}
-					else if (ForwardDotProduct > 0) //Player is in front but outside the angle threshold.
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Player is in front but outside the angle threshold."));
-					}
-					else
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Player is behind the AI."));
-					}
+					//if (ForwardDotProduct >= CosineThreshold) // Player is directly front of AI
+					//{
+					//	AIController->StopMovement();
+					//	PlayMontageOnce(ControlledCharacter, BiteFWDMontage, FName("walk_bite_front"));
+					//}
+					//else if (ForwardDotProduct > 0) //Player is in front but outside the angle threshold.
+					//{
+					//	UE_LOG(LogTemp, Warning, TEXT("Player is in front but outside the angle threshold."));
+					//}
+					//else
+					//{
+					//	UE_LOG(LogTemp, Warning, TEXT("Player is behind the AI."));
+					//}
 
-					// Left or right check based on RightDotProduct
-					if (RightDotProduct > 0) //Player is on the right of the AI.
-					{
-						AIController->StopMovement();
-						PlayMontageOnce(ControlledCharacter, BiteRSMontage, FName("walk_bite_right"));
-					}
-					else if (RightDotProduct < 0)// Player is on the left of the AI.
-					{
-						AIController->StopMovement();
-						PlayMontageOnce(ControlledCharacter, BiteLSMontage, FName("walk_bite_left"));
-					}
+					//// Left or right check based on RightDotProduct
+					//if (RightDotProduct > 0) //Player is on the right of the AI.
+					//{
+					//	AIController->StopMovement();
+					//	PlayMontageOnce(ControlledCharacter, BiteRSMontage, FName("walk_bite_right"));
+					//}
+					//else if (RightDotProduct < 0)// Player is on the left of the AI.
+					//{
+					//	AIController->StopMovement();
+					//	PlayMontageOnce(ControlledCharacter, BiteLSMontage, FName("walk_bite_left"));
+					//}
 
 
 				}

@@ -158,34 +158,34 @@ void AWeaponBase::StartFire()
 {
 
 
-	if (WeaponType == EWeaponType::WT_PISTOL)
+	if (WeaponType == EWeaponTypo::WT_PISTOL)
 	{
-		if (FireType == EFireWeaponType::FWT_AUTO)
+		if (FireType == EFireModo::FM_AUTO)
 		{
 			float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds, 0.0f);
 			GetWorldTimerManager().SetTimer(TimerHandle_TimeBetweenShots, this, &AWeaponBase::Fire, TimeBetweenShots, true, FirstDelay);
 		}
-		else if (FireType == EFireWeaponType::FWT_SINGLE)
+		else if (FireType == EFireModo::FM_SINGLE)
 		{
 			Fire();
 		}
-		else if (FireType == EFireWeaponType::FWT_BURST)
+		else if (FireType == EFireModo::FM_BURST)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Your current weapon is of type: Pistol:FWT_BURST"));
 		}
 	}
-	else if (WeaponType == EWeaponType::WT_RIFLE)
+	else if (WeaponType == EWeaponTypo::WT_RIFLE)
 	{
-		if (FireType == EFireWeaponType::FWT_AUTO)
+		if (FireType == EFireModo::FM_AUTO)
 		{
 			float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds, 0.0f);
 			GetWorldTimerManager().SetTimer(TimerHandle_TimeBetweenShots, this, &AWeaponBase::Fire, TimeBetweenShots, true, FirstDelay);
 		}
-		else if (FireType == EFireWeaponType::FWT_SINGLE)
+		else if (FireType == EFireModo::FM_SINGLE)
 		{
 			Fire();
 		}
-		else if (FireType == EFireWeaponType::FWT_BURST)
+		else if (FireType == EFireModo::FM_BURST)
 		{
 
 			UE_LOG(LogTemp, Warning, TEXT("Your current weapon is of type: WT_RIFLE:FWT_BURST"));

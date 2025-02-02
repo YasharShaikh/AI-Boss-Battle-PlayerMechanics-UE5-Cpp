@@ -6,13 +6,13 @@
 
 void UIdleStateComponent::EnterState(ATrexAIController* AIController)
 {
-    UE_LOG(LogTemp, Warning, TEXT("Entering Idle State"));
+    //UE_LOG(LogTemp, Warning, TEXT("Entering Idle State"));
      //Additional logic for entering Idle state
 }
 
 void UIdleStateComponent::UpdateState(ATrexAIController* AIController, float DeltaTime)
 {
-    UE_LOG(LogTemp, Warning, TEXT("inside IDLE State"));
+    //UE_LOG(LogTemp, Warning, TEXT("inside IDLE State"));
 }
 
 void UIdleStateComponent::OnPawnDetected(ATrexAIController* AIController, AActor* DetectedPawn)
