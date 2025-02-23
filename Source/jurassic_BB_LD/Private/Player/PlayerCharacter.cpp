@@ -15,6 +15,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Weapon/WeaponSystemComponent.h"
 #include "Weapon/WeaponPickup.h"
+#include "Player/TelekinesisComponent.h"
 
 class DamageInflictingObject;
 class InteractableForPlacement;
@@ -42,7 +43,7 @@ APlayerCharacter::APlayerCharacter()
 	tripwireComponent = CreateDefaultSubobject<UTripWireComponent>(TEXT("Trip Wire Component"));
 
 	WeaponSystemComponent = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("Weapon Component"));
-
+	TelekinesisComponent = CreateDefaultSubobject<UTelekinesisComponent>(TEXT("Telekinesis Component"));
 }
 
 // Called when the game starts or when spawned

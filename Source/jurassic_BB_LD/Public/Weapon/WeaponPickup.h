@@ -77,6 +77,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon | Properties")	AAWeaponMagazine* CurrentMagazine;
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon | Properties") TSubclassOf<class AAWeaponMagazine> MagazineClass;
 
+	//UFUNCTION(BlueprintCallable, Category = "Weapon") void OnDropMagzine();
+
+	//UFUNCTION(BlueprintCallable, Category = "Weapon") void OnAttachMagzine();
+
 	UFUNCTION() void DropMagazineNotify();
 	UFUNCTION() void AttachMagazineNotify();
 

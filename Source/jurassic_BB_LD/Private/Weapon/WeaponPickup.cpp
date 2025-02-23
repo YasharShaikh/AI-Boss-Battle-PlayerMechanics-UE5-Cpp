@@ -23,7 +23,7 @@ void AWeaponPickup::BeginPlay()
 	Super::BeginPlay();
 
 	SetPickupMesh(true);
-
+	InitializeMagazinePool();
 	if (RateofFIre > 0)
 	{
 		TimeBetweenShots = 60 / RateofFIre;
@@ -179,6 +179,7 @@ void AWeaponPickup::DropMagazineNotify()
 }
 void AWeaponPickup::AttachMagazineNotify()
 {
+	UE_LOG(LogTemp, Error, TEXT("Called from attachm magzine notify."));
 	if (!MagazineClass)
 	{
 		UE_LOG(LogTemp, Error, TEXT("MagazineClass is NULL! Assign a magazine class in the WeaponPickup properties."));

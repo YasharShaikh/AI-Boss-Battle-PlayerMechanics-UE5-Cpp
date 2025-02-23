@@ -23,6 +23,8 @@ class UBoxComponent;
 class USkeletalMeshComponent;
 class AWeaponPickup;
 class UWeaponSystemComponent;
+class UTelekinesisComponent;
+
 
 UCLASS()
 class JURASSIC_BB_LD_API APlayerCharacter : public ACharacter
@@ -111,12 +113,11 @@ protected:
 
 #pragma region EXO Telekinesis
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Player Character | EXO Telekinesis System")		bool bUsingTelekinesis;
-	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")			float  maxPickRange;
-	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")			float pullForce;
-	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")			float pushForce;
-	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")
-	UCurveFloat* DashCurve = nullptr;
+	UPROPERTY(VisibleAnywhere, Category = "Player Character | EXO Telekinesis System")	bool bUsingTelekinesis;
+	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")		float  maxPickRange;
+	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")		float pullForce;
+	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")		float pushForce;
+	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")		UCurveFloat* DashCurve = nullptr;
 
 	UFUNCTION(BlueprintCallable)	void Telekinesis_Pull();
 	UFUNCTION(BlueprintCallable)	void Telekinesis_Push();
@@ -151,6 +152,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Character | Trap")	UTripWireComponent* tripwireComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components") UWeaponSystemComponent* WeaponSystemComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components") UTelekinesisComponent* TelekinesisComponent;
 
 #pragma endregion
 

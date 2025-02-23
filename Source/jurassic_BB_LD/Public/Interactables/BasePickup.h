@@ -20,18 +20,18 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup")
+    UStaticMeshComponent* pickupStaticMesh;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup")
+    USkeletalMeshComponent* pickupSkeletalMesh;
 
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup")
-    UStaticMeshComponent* pickupStaticMesh;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup")
-    USkeletalMeshComponent* pickupSkeletalMesh;
+   
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup|Highlight")
     UMaterialInstanceDynamic* HighlightMaterialInstance;

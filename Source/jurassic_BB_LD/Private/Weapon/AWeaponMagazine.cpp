@@ -35,8 +35,7 @@ void AAWeaponMagazine::AttachToWeapon(AWeaponPickup* Weapon)
 {
 	if (Weapon)
 	{
-		AttachToComponent(Weapon->GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "Magzine_Socket");
-
+		AttachToComponent(Weapon->pickupSkeletalMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, "Magazine_Socket");
 		SetActorHiddenInGame(false);
 		SetActorEnableCollision(false);
 		MagazineMesh->SetSimulatePhysics(false);
@@ -72,6 +71,7 @@ void AAWeaponMagazine::ResetMagazine()
 {
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
+	MagazineMesh->SetSimulatePhysics(false);
 	SetActorTickEnabled(false);
 }
 
