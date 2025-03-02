@@ -52,7 +52,7 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "Handle Object state")
-	void EnterState(EObjectState nextState);
+	void EnterState(EObjectStates nextState);
 	//void ExitState(EObjectState currentState);
 	void HandleNONEState();
 	void HandleHIGHLIGHTState();
@@ -66,7 +66,7 @@ public:
 	//Variables
 	bool isWatchingMe;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Object state") EObjectState currentState;
+	UPROPERTY(BlueprintReadWrite, Category = "Object state") EObjectStates currentState;
 	UPROPERTY(BlueprintReadWrite) bool ObjectLifted = false;
 
 

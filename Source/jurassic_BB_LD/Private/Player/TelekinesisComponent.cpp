@@ -41,7 +41,7 @@ void UTelekinesisComponent::StartTelekinesis()
 	ATelekineticObject* Object = Cast<ATelekineticObject>(ActorHit);
 	if (!Object) return;
 
-	const FTelekineticObjectStats* Stats = Object->GetSizeStats();  
+	const FTelekineticObjectStats* Stats = Object->GetSizeStats();
 
 
 
@@ -73,27 +73,27 @@ void UTelekinesisComponent::StartTelekinesis()
 void UTelekinesisComponent::HoldTelekineticObject()
 {
 	if (!HeldObject) return;
-	UE_LOG(LogTemp, Warning, TEXT("Holding Object"));
+	HeldObject->EnterState(ETObjectState::Lifting);
+	if (CurrentStamina == 0.0f)
+	{
+		HeldObject->EnterState(ETObjectState::Thrown);
+		bIsHoldingObject = false;
 
-	FVector HoldPosition = PlayerCharacter->GetActorLocation() + (PlayerCharacter->GetActorForwardVector() * 200.0f);
-	HeldObject->MoveTowardsPlayer(HoldPosition, GetWorld()->GetDeltaSeconds());
+	}
 }
 
 void UTelekinesisComponent::ReleaseTelekineticObject()
 {
+
 	if (!HeldObject) return;
 
-	FVector ForwardVector = PlayerCharacter->GetControlRotation().Vector();
-	HeldObject->MoveTowardsEnemy(ForwardVector);
-
-	HeldObject = nullptr;
+	HeldObject->EnterState(ETObjectState::Thrown);
 	bIsHoldingObject = false;
-
-	UE_LOG(LogTemp, Log, TEXT("Telekinetic Object Released & Thrown"));
 }
 
 void UTelekinesisComponent::UpdateStamina(float DeltaTime)
 {
+
 	if (PlayerCharacter && HeldObject)
 	{
 		ConsumeStamina(SafePullDistance * DeltaTime);

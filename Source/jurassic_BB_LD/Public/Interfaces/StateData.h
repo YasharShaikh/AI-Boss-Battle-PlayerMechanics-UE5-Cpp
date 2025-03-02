@@ -4,7 +4,7 @@
 #include "StateData.generated.h"
 
 UENUM(BlueprintType)
-enum class EObjectState : uint8
+enum class EObjectStates : uint8
 {
 	EOS_NONE		UMETA(DisplayName = "NONE"),
 	EOS_HIGHLIGHT	UMETA(DisplayName = "HIGHLIGHT"),

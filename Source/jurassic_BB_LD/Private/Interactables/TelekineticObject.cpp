@@ -4,116 +4,176 @@
 #include "Components/PrimitiveComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-// **Optimized Static TMap (Stored in Read-Only Memory)**
-const TMap<EObjectSize, FTelekineticObjectStats> ATelekineticObject::ObjectStatsMap = {
-	{ EObjectSize::Small,  { 0.5f, 5.0f, 10.0f, 5.0f,5000.0f } },
-	{ EObjectSize::Medium, { 1.0f, 10.0f, 05.0f, 0.05f, 5000.0f } },
-	{ EObjectSize::Large,  { 1.5f, 15.0f, 30.0f, 12.0f, 50.0f } }
+const TArray<FTelekineticObjectStats> ATelekineticObject::ObjectStatsArray = {
+
+	// Scale, Dmg, Stam, Distance,  MaxPull, Lift, Throw, Mass,  PushSpeed
+	{ 0.5f, 5.0f, 10.0f, 500.0f, 5000.0f, 100.0f, 2000.0f, 50.0f, 1500.0f  }, // Small  
+	{ 1.0f, 10.0f, 0.50f, 1000.0f, 3000.0f, 50.0f, 1500.0f, 100.0f, 1500.0f  }, // Medium
+	{ 1.5f, 15.0f, 30.0f, 1500.0f, 1000.0f,100.0f, 800.0f, 200.0f, 500.0f  } // Large
 };
 
-// **Constructor: Initialize Default Size**
 ATelekineticObject::ATelekineticObject()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
+
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	RootComponent = MeshComponent;
 	ObjectSize = EObjectSize::Medium;
-
-	bHasBeenLifted = false;
-	bHasBeenThrown = false;
 }
-
-void ATelekineticObject::Tick(float DeltaTime) {}
 
 void ATelekineticObject::BeginPlay()
 {
 	Super::BeginPlay();
+	playerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	SetSize(ObjectSize);
+}
+void ATelekineticObject::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (!playerCharacter || !playerCharacter->objectHoldPosition)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Missing player reference!"));
+		return;
+	}
+
+	switch (CurrentState)
+	{
+	case ETObjectState::Lifting:
+	{
+		TargetPostion = playerCharacter->objectHoldPosition->GetComponentLocation();
+		const FVector NewLocation = FMath::VInterpTo(
+			GetActorLocation(),
+			TargetPostion,
+			DeltaTime,
+			CachedStats.LiftSpeed
+		);
+
+		// Check if reached target with threshold
+		const bool bReached = FVector::DistSquared(NewLocation, TargetPostion) < FMath::Square(50.0f);
+		SetActorLocation(NewLocation, false, nullptr, ETeleportType::TeleportPhysics);
+
+		if (bReached) EnterState(ETObjectState::Held);
+	}
+	break;
+
+	case ETObjectState::Held:
+	{
+		// Smoothly maintain position
+		TargetPostion = playerCharacter->objectHoldPosition->GetComponentLocation();
+		const FVector NewLocation = FMath::VInterpTo(
+			GetActorLocation(),
+			TargetPostion,
+			DeltaTime,
+			CachedStats.LiftSpeed * 0.5f  // Slower follow speed
+		);
+		SetActorLocation(NewLocation, false, nullptr, ETeleportType::None);
+
+		// Controlled rotation
+		const FRotator TargetRotation = FRotator(
+			FMath::Sin(GetWorld()->GetTimeSeconds()) * 45.0f,
+			FMath::Cos(GetWorld()->GetTimeSeconds()) * 45.0f,
+			0.0f
+		);
+		MeshComponent->SetWorldRotation(FMath::RInterpTo(
+			GetActorRotation(),
+			TargetRotation,
+			DeltaTime,
+			CachedStats.LiftSpeed * 0.3f
+		));
+	}
+	break;
+
+	//case ETObjectState::Thrown:
+	//{
+	//	// Check velocity magnitude to determine if stopped
+	//	const float SpeedSq = MeshComponent->GetPhysicsLinearVelocity().SizeSquared();
+	//	if (SpeedSq < FMath::Square(0.10f))  // 50 cm/s threshold
+	//	{
+	//		EnterState(ETObjectState::Idle);
+	//	}
+	//}
+	//break;
+	}
 }
 
 void ATelekineticObject::SetSize(EObjectSize Size)
 {
-	ObjectSize = Size;
 
-	const FTelekineticObjectStats* Stats = ObjectStatsMap.Find(Size);
-	if (Stats)
+	const int32 Index = static_cast<int32>(Size);
+	if (ObjectStatsArray.IsValidIndex(Index))
 	{
-		CachedStats = *Stats;
+		CachedStats = ObjectStatsArray[Index];
 		MeshComponent->SetRelativeScale3D(FVector(CachedStats.MeshScaleFactor));
-
-		UE_LOG(LogTemp, Warning, TEXT("Size Set: %d | Damage: %.1f | Stamina Cost: %.1f"),
-			static_cast<int32>(Size), CachedStats.Damage, CachedStats.StaminaCost);
+		MeshComponent->SetMassOverrideInKg(NAME_None, CachedStats.Mass);
 	}
 }
-bool ATelekineticObject::LiftObject(float DeltaTime)
+
+
+void ATelekineticObject::EnterState(ETObjectState NewState)
 {
-	if (bHasBeenLifted)
-		return true;
 
-	FVector CurrentLocation = GetActorLocation();
+	if (CurrentState == NewState) return;
 
-	// **Use Exponential Decay for Smoother Motion**
-	float Alpha = 1.0f - FMath::Exp(-LiftSpeed * DeltaTime);
-	float NewZLocation = FMath::Lerp(CurrentLocation.Z, LiftEndLocation, Alpha);
-
-	SetActorLocation(FVector(CurrentLocation.X, CurrentLocation.Y, NewZLocation));
-
-	if (FMath::IsNearlyEqual(NewZLocation, LiftEndLocation, 1.0f))
+	// Exit current state
+	switch (CurrentState)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Telekinetic object Lift Complete "));
-		bHasBeenLifted = true; // Prevents unnecessary lifting
-		return true;
+	case ETObjectState::Held:
+		MeshComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
+		break;
 	}
-	UE_LOG(LogTemp, Log, TEXT("Telekinetic object LIFTING "));
-	return false;
-}
 
-// **Optimized MoveTowardsPlayer**
-void ATelekineticObject::MoveTowardsPlayer(const FVector& HoldPosition, float DeltaTime)
-{
-	if (!bHasBeenLifted && !LiftObject(DeltaTime))
-		return; // Ensure object is lifted first
+	CurrentState = NewState;
 
-	MeshComponent->SetEnableGravity(false);
-	MeshComponent->SetLinearDamping(20.f);
-
-	FVector CurrentLocation = GetActorLocation();
-	FVector Direction = (HoldPosition - CurrentLocation).GetSafeNormal();
-	float DistanceToHoldPosSq = FVector::DistSquared(CurrentLocation, HoldPosition);
-
-	// **Check if the object is outside the safe pull distance**
-	if (DistanceToHoldPosSq > FMath::Square(CachedStats.SafePullDistance))
+	switch (NewState)
 	{
-		float PullForceMagnitude = FMath::Clamp(600.0f * FMath::Sqrt(DistanceToHoldPosSq), 0.0f, MaxPullForce);
+	case ETObjectState::Idle:
+		SetActorTickEnabled(false);
+		UpdatePhysicsSettings(true);
+		ResetPhysicsState();
+		break;
 
-		MeshComponent->AddImpulse(Direction * PullForceMagnitude, NAME_None, true);
+	case ETObjectState::Lifting:
+		SetActorTickEnabled(true);
+		UpdatePhysicsSettings(false);
+		ResetPhysicsState();
+		break;
 
-		// **Add Rotational Force for Realistic Motion**
-		FVector AngularImpulse = FVector(FMath::RandRange(-1.f, 1.f),
-			FMath::RandRange(-1.f, 1.f),
-			FMath::RandRange(-1.f, 1.f)).GetSafeNormal() * PullForceMagnitude * 0.1f;
+	case ETObjectState::Held:
+	{
+		SetActorTickEnabled(true);
+		UpdatePhysicsSettings(true);
+		break;
+	}
 
-		MeshComponent->AddAngularImpulseInDegrees(AngularImpulse, NAME_None, true);
+
+	case ETObjectState::Thrown:
+		SetActorTickEnabled(true);
+		UpdatePhysicsSettings(false);
+		ResetPhysicsState();
+		if (playerCharacter)
+		{
+			FVector ForwardVector = playerCharacter->GetActorForwardVector();
+			FVector Impulse = ForwardVector * CachedStats.PushSpeed;
+			MeshComponent->AddImpulse(Impulse, NAME_None, true);
+		}
+		break;
+
+	default:
+		break;
 	}
 }
 
-// **Move Towards Enemy (Throw Mechanic)**
-void ATelekineticObject::MoveTowardsEnemy(const FVector& ScreenCenter)
+void ATelekineticObject::UpdatePhysicsSettings(bool bHoverMode)
 {
-	if (bHasBeenThrown)
-		return; // Prevent multiple throw forces
+	MeshComponent->SetEnableGravity(!bHoverMode);
+	MeshComponent->SetLinearDamping(bHoverMode ? 20.0f : 0.1f);
+	MeshComponent->SetAngularDamping(bHoverMode ? 2.0f : 0.5f);
+}
 
-	MeshComponent->SetEnableGravity(true);
-	MeshComponent->SetLinearDamping(0.1f);
-
-	FVector ForwardVector = ScreenCenter.GetSafeNormal();
-	FVector Impulse = ForwardVector * ThrowSpeed;
-
-	MeshComponent->AddImpulse(Impulse, NAME_None, true);
-
-	// Mark as thrown to avoid multiple impulse applications
-	bHasBeenThrown = true;
-
-	UE_LOG(LogTemp, Warning, TEXT("Telekinetic Object Thrown at Speed: %f"), ThrowSpeed);
+void ATelekineticObject::ResetPhysicsState()
+{
+	MeshComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
+	MeshComponent->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 }

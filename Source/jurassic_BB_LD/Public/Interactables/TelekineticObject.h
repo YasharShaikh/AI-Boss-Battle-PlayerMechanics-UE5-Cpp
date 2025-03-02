@@ -12,28 +12,48 @@ struct FTelekineticObjectStats
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Telekinesis")
+	UPROPERTY(EditDefaultsOnly)
 	float MeshScaleFactor = 1.0f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Telekinesis")
-	float Damage = 5.0f;
+	UPROPERTY(EditDefaultsOnly)
+	float Damage = 10.0f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Telekinesis")
-	float StaminaCost = 10.0f;
+	UPROPERTY(EditDefaultsOnly)
+	float StaminaCost = 5.0f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Telekinesis")
-	float ContinuousStaminaDrain = 5.0f;
+	UPROPERTY(EditDefaultsOnly)
+	float SafePullDistance = 500.0f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Telekinesis")
-	float SafePullDistance = 100.0f;
+	UPROPERTY(EditDefaultsOnly)
+	float MaxPullForce = 5000.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float LiftSpeed = 8.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float ThrowForce = 1500.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float Mass = 100.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float PushSpeed = 100.0f;
 };
-
 UENUM(BlueprintType)
 enum class EObjectSize : uint8
 {
 	Small     UMETA(DisplayName = "Small"),
 	Medium    UMETA(DisplayName = "Medium"),
 	Large     UMETA(DisplayName = "Large")
+};
+
+UENUM(BlueprintType)
+enum class ETObjectState : uint8
+{
+	Idle,
+	Lifting,
+	Held,
+	Thrown
 };
 
 UCLASS()
@@ -45,16 +65,19 @@ public:
 	ATelekineticObject();
 	virtual void Tick(float DeltaTime) override;
 
-	void MoveTowardsPlayer(const FVector& HoldPosition, float deltaTime);
-	void MoveTowardsEnemy(const FVector& screenCenter);
-
 
 	inline float GetSafePullDistance() const { return CachedStats.SafePullDistance; }
 	inline const FTelekineticObjectStats* GetSizeStats() const { return &CachedStats; }
 
+	void EnterState(ETObjectState NewState);
+
 protected:
+
+
 	virtual void BeginPlay() override;
 	void SetSize(EObjectSize Size);
+	APlayerCharacter* playerCharacter;
+	FVector TargetPostion;
 
 
 private:
@@ -64,6 +87,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Telekinesis")
 	EObjectSize ObjectSize;
+
+	UPROPERTY(VisibleAnywhere, Category = "Telekinesis")
+	ETObjectState ObjectState;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Telekinesis")
 	float ThrowSpeed = 50.0f;
@@ -75,14 +101,12 @@ private:
 	float MaxPullForce = 5000.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Telekinesis")
-	float LiftEndLocation = 5000.0f;
+	ETObjectState CurrentState = ETObjectState::Idle;
 
-
-	bool bHasBeenThrown;
-	bool bHasBeenLifted;
 	FTelekineticObjectStats CachedStats;
 
-	static const TMap<EObjectSize, FTelekineticObjectStats> ObjectStatsMap;
+	static const TArray<FTelekineticObjectStats> ObjectStatsArray;
 
-	bool LiftObject(float DeltaTime);
+	void UpdatePhysicsSettings(bool bHoverMode);
+	void ResetPhysicsState();
 };

@@ -154,6 +154,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components") UWeaponSystemComponent* WeaponSystemComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components") UTelekinesisComponent* TelekinesisComponent;
 
+
+	UFUNCTION()
+	void StartTelekinesis();
+
+	UFUNCTION()
+	void ReleaseTelekineticObject();
 #pragma endregion
 
 

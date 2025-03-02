@@ -14,7 +14,7 @@ ADamageInflictingObject::ADamageInflictingObject()
 
 
 
-	currentState = EObjectState::EOS_NONE;
+	currentState = EObjectStates::EOS_NONE;
 
 
 
@@ -42,7 +42,7 @@ void ADamageInflictingObject::Tick(float DeltaTime)
 
 	if (!isWatchingMe)
 	{
-		currentState = EObjectState::EOS_NONE;
+		currentState = EObjectStates::EOS_NONE;
 		EnterState(currentState);
 	}
 	if (isLifting)
@@ -78,23 +78,23 @@ void ADamageInflictingObject::Interact_Implementation()
 	isWatchingMe = true;
 }
 
-void ADamageInflictingObject::EnterState(EObjectState nextState)
+void ADamageInflictingObject::EnterState(EObjectStates nextState)
 {
 	switch (nextState)
 	{
-	case EObjectState::EOS_NONE:
+	case EObjectStates::EOS_NONE:
 		HandleNONEState();
 		break;
-	case EObjectState::EOS_HIGHLIGHT:
+	case EObjectStates::EOS_HIGHLIGHT:
 		HandleHIGHLIGHTState();
 		break;
-	case EObjectState::EOS_PULL:
+	case EObjectStates::EOS_PULL:
 		HandlePULLState();
 		break;
-	case EObjectState::EOS_HOLD:
+	case EObjectStates::EOS_HOLD:
 		HandleHOLDState();
 		break;
-	case EObjectState::EOS_PUSH:
+	case EObjectStates::EOS_PUSH:
 		HandlePUSHState();
 		break;
 	}

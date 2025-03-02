@@ -101,6 +101,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(FName("Interact"), IE_Released, this, &APlayerCharacter::interactReleased);
 
 
+
+		PlayerInputComponent->BindAction(FName("Interact"), IE_Pressed, this, &APlayerCharacter::StartTelekinesis);
+		PlayerInputComponent->BindAction(FName("Interact"), IE_Released, this, &APlayerCharacter::ReleaseTelekineticObject);
+
+
 }
 
 void APlayerCharacter::MoveForward(float axisValue)
@@ -229,15 +234,15 @@ void APlayerCharacter::DetectTelekineticObject()
 					bIsDamageInflictingObject = true;
 					if (storeDamageInflictingObject && storeDamageInflictingObject != damageInflictingObject)
 					{
-						storeDamageInflictingObject->EnterState(EObjectState::EOS_NONE);
+						storeDamageInflictingObject->EnterState(EObjectStates::EOS_NONE);
 					}
 					storeDamageInflictingObject = damageInflictingObject;
-					storeDamageInflictingObject->EnterState(EObjectState::EOS_HIGHLIGHT);
+					storeDamageInflictingObject->EnterState(EObjectStates::EOS_HIGHLIGHT);
 				}
 				else if (storeDamageInflictingObject)
 				{
 					bIsDamageInflictingObject = false;
-					storeDamageInflictingObject->EnterState(EObjectState::EOS_NONE);
+					storeDamageInflictingObject->EnterState(EObjectStates::EOS_NONE);
 					storeDamageInflictingObject = nullptr;
 				}
 				if (AInteractableForPlacement* interactableForPlacement = Cast<AInteractableForPlacement>(hitResult.GetActor()))
@@ -263,12 +268,11 @@ void APlayerCharacter::DetectTelekineticObject()
 
 void APlayerCharacter::Telekinesis_Pull()
 {
-
 	if (storeDamageInflictingObject)
 	{
 
 		bUsingTelekenisis = true;
-		storeDamageInflictingObject->EnterState(EObjectState::EOS_PULL);
+		storeDamageInflictingObject->EnterState(EObjectStates::EOS_PULL);
 	}
 	else
 	{
@@ -281,7 +285,7 @@ void APlayerCharacter::Telekinesis_Push()
 {
 	if (storeDamageInflictingObject)
 	{
-		storeDamageInflictingObject->EnterState(EObjectState::EOS_PUSH);
+		storeDamageInflictingObject->EnterState(EObjectStates::EOS_PUSH);
 		storeDamageInflictingObject = nullptr;
 		bUsingTelekenisis = false;
 	}
@@ -318,6 +322,8 @@ void APlayerCharacter::PlayMontage(UAnimMontage* Montage, FName SectionName)
 	}
 }
 
+
+
 AActor* APlayerCharacter::HitDetection()
 {
 
@@ -348,7 +354,33 @@ AActor* APlayerCharacter::HitDetection()
 	return nullptr;
 }
 
+void APlayerCharacter::StartTelekinesis()
+{
+	if (TelekinesisComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("StartTelekinesis From Player CHaracter"));
+		TelekinesisComponent->StartTelekinesis();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("StartTelekinesis From Player CHaracter, NOT FOUND"));
+	}
+}
 
+void APlayerCharacter::ReleaseTelekineticObject()
+{
+	if (TelekinesisComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ReleaseTelekineticObject From Player CHaracter"));
+		TelekinesisComponent->ReleaseTelekineticObject();
+	}
+	else
+	{
+
+		UE_LOG(LogTemp, Error, TEXT("ReleaseTelekineticObject From Player CHaracter,, NOT FOUND"));
+
+	}
+}
 
 
 #pragma endregion
