@@ -25,7 +25,6 @@ void UHuntStateComponent::EnterState(ATrexAIController* AIController)
 
 void UHuntStateComponent::UpdateState(ATrexAIController* AIController, float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("updating Hunt State"));
 
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(AIController->GetWorld(), 0);
 
