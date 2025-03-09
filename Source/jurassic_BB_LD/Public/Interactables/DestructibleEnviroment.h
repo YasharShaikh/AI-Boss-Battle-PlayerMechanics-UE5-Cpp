@@ -7,6 +7,7 @@
 #include "DestructibleEnviroment.generated.h"
 
 class UStaticMeshComponent;
+class ATelekineticObject;
 
 UCLASS()
 class JURASSIC_BB_LD_API ADestructibleEnviroment : public AActor
@@ -25,16 +26,18 @@ protected:
 
 
 
-    UFUNCTION(BlueprintCallable)
-    void TakeDamage(float damageAmount);
-	UPROPERTY(BlueprintReadWrite, Category = "Destructible Enviroment")
-	float MaxHealth;
-	UPROPERTY(BlueprintReadWrite, Category = "Destructible Enviroment")
-	float CurrentHealth;
+    UFUNCTION(BlueprintCallable) void TakeDamage(float damageAmount);
+	UFUNCTION(BlueprintCallable) void Destruct();
+    
+	UPROPERTY(BlueprintReadWrite, Category = "Destructible Enviroment") float MaxHealth;
+	
+	UPROPERTY(BlueprintReadWrite, Category = "Destructible Enviroment") float CurrentHealth;
+	
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Telekinesis")
-	UStaticMeshComponent* MeshComponent;
-
+	UPROPERTY(VisibleAnywhere, Category = "Telekinesis") UStaticMeshComponent* MeshComponent;
+	
+	UPROPERTY(EditAnywhere, Category = "Destructible", meta = (MustImplement = "PoolableInterface"))
+	TSubclassOf<AActor> TelekineticObjectClass;
 
 };

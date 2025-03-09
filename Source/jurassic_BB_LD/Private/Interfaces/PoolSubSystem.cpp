@@ -38,15 +38,27 @@
 
 void UPoolSubSystem::ReturnToPool(AActor* Poolable)
 {
-	const UClass* PoolableClass = Poolable->GetClass();
-	if (PoolableClass->ImplementsInterface(UPoolableInterface::StaticClass()))
-	{
-		IPoolableInterface::Execute_OnReturnToPool(Poolable);
-		FPoolArray* ObjectPool = ObjectPools.Find(PoolableClass);
-		ObjectPool->Add(Poolable);
-	}
-	else
-	{
-		Poolable->Destroy();
-	}
+    const UClass* PoolableClass = Poolable->GetClass();
+    if (PoolableClass && PoolableClass->ImplementsInterface(UPoolableInterface::StaticClass()))
+    {
+        IPoolableInterface::Execute_OnReturnToPool(Poolable);
+
+        // Safely retrieve or handle missing pool
+        FPoolArray* ObjectPool = ObjectPools.Find(PoolableClass);
+        if (ObjectPool)
+        {
+            ObjectPool->Add(Poolable);
+        }
+        else
+        {
+            // Destroy actor if pool doesn't exist (edge case)
+            Poolable->Destroy();
+            UE_LOG(LogTemp, Warning, TEXT("Attempted to return %s to non-existent pool!"), *Poolable->GetName());
+        }
+    }
+    else
+    {
+        // Destroy non-poolable actors
+        Poolable->Destroy();
+    }
 }

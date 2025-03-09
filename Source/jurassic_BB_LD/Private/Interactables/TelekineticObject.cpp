@@ -3,12 +3,14 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Interfaces/PoolSubSystem.h"
+
 
 const TArray<FTelekineticObjectStats> ATelekineticObject::ObjectStatsArray = {
 
 	// Scale, Dmg, Stam, Distance,  MaxPull, Lift, Throw, Mass,  PushSpeed
 	{ 0.5f, 5.0f, 10.0f, 500.0f, 5000.0f, 100.0f, 2000.0f, 50.0f, 1500.0f  }, // Small  
-	{ 1.0f, 10.0f, 0.50f, 1000.0f, 3000.0f, 50.0f, 1500.0f, 100.0f, 1500.0f  }, // Medium
+	{ 1.0f, 10.0f, 0.50f, 1000.0f, 3000.0f, 0.50f, 200.0f, 100.0f, 5000.0f  }, // Medium
 	{ 1.5f, 15.0f, 30.0f, 1500.0f, 1000.0f,100.0f, 800.0f, 200.0f, 500.0f  } // Large
 };
 
@@ -165,6 +167,8 @@ void ATelekineticObject::EnterState(ETObjectState NewState)
 	}
 }
 
+
+
 void ATelekineticObject::UpdatePhysicsSettings(bool bHoverMode)
 {
 	MeshComponent->SetEnableGravity(!bHoverMode);
@@ -176,4 +180,36 @@ void ATelekineticObject::ResetPhysicsState()
 {
 	MeshComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
 	MeshComponent->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+}
+
+void ATelekineticObject::ReturnToPool()
+{
+	if (CurrentState == ETObjectState::Thrown)
+	{
+		if (UPoolSubSystem* PoolSubSystem = GetWorld()->GetSubsystem<UPoolSubSystem>())
+		{
+			PoolSubSystem->ReturnToPool(this);
+		}
+	}
+}
+
+void ATelekineticObject::OnSpawnFromPool_Implementation()
+{    // Basic activation (you NEED at least this)
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	// Required state reset
+	CurrentState = ETObjectState::Idle;
+}
+
+void ATelekineticObject::OnReturnToPool_Implementation()
+{
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ResetPhysicsState();
+
+	// Optional: Reset any other object-specific state
+	CurrentState = ETObjectState::Idle;
 }
