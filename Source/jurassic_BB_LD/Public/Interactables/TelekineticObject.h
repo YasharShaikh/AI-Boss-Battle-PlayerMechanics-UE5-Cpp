@@ -68,25 +68,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Telekinesis")
 	EObjectSize ObjectSize;
 
-	ATelekineticObject();
-	virtual void Tick(float DeltaTime) override;
-
-	inline float GetSafePullDistance() const { return CachedStats.SafePullDistance; }
-	inline const FTelekineticObjectStats* GetSizeStats() const { return &CachedStats; }
-
-	void EnterState(ETObjectState NewState);
-
-	virtual void OnSpawnFromPool_Implementation() override;
-	virtual void OnReturnToPool_Implementation() override;
-
-protected:
-
-	virtual void BeginPlay() override;
-	void SetSize(EObjectSize Size);
-	APlayerCharacter* playerCharacter;
-	FVector TargetPostion;
-
-private:
+	UFUNCTION(BlueprintPure, Category = "Telekinesis")
+	ETObjectState GetCurrentState() const { return CurrentState; }
 
 	UPROPERTY(VisibleAnywhere, Category = "Telekinesis")
 	UStaticMeshComponent* MeshComponent;
@@ -103,8 +86,31 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Telekinesis")
 	float MaxPullForce = 5000.0f;
 
-	UPROPERTY(VisibleAnywhere, Category = "Telekinesis")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Telekinesis")
 	ETObjectState CurrentState = ETObjectState::Idle;
+
+
+	ATelekineticObject();
+	virtual void Tick(float DeltaTime) override;
+
+	inline float GetSafePullDistance() const { return CachedStats.SafePullDistance; }
+	inline const FTelekineticObjectStats* GetSizeStats() const { return &CachedStats; }
+
+	void EnterState(ETObjectState NewState);
+
+	virtual void OnSpawnFromPool_Implementation() override;
+	virtual void OnReturnToPool_Implementation() override;
+
+protected:
+
+
+	virtual void BeginPlay() override;
+	void SetSize(EObjectSize Size);
+	APlayerCharacter* playerCharacter;
+	FVector TargetPostion;
+
+private:
+
 
 	FTelekineticObjectStats CachedStats;
 
