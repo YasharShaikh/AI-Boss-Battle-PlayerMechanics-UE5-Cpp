@@ -28,46 +28,60 @@ void UTelekinesisComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UTelekinesisComponent::StartTelekinesis()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Start Telekinesis"));
 
-	if (!PlayerCharacter)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Player Character not found"));
-		return;
-	}
-	AActor* ActorHit = PlayerCharacter->HitDetection();
-	if (!ActorHit || !ActorHit->ActorHasTag("TelekineticObject")) return;
+    if (!PlayerCharacter)
+    {
+        return;
+    }
 
-	ATelekineticObject* Object = Cast<ATelekineticObject>(ActorHit);
-	if (!Object) return;
+    AActor* ActorHit = PlayerCharacter->HitDetection();
+    if (!ActorHit)
+    {
+        return;
+    }
 
-	const FTelekineticObjectStats* Stats = Object->GetSizeStats();
+    if (!ActorHit->ActorHasTag("TelekineticObject"))
+    {
+        return;
+    }
+
+    ATelekineticObject* Object = Cast<ATelekineticObject>(ActorHit);
+    if (!Object)
+    {
+        return;
+    }
+
+    // Fetch stats
+    const FTelekineticObjectStats* Stats = Object->GetSizeStats();
+    if (!Stats)
+    {
+        return;
+    }
+
+    // Calculate distance
+    float DistanceToObject = FVector::Dist(PlayerCharacter->GetActorLocation(), Object->GetActorLocation());
+
+    if (DistanceToObject > Stats->SafePullDistance)
+    {
+        return;
+    }
+
+    // Check stamina
+    if (CurrentStamina < Stats->StaminaCost)
+    {
+        return;
+    }
+
+    // Consume stamina
+    ConsumeStamina(Stats->StaminaCost);
+
+    // Assign the object
+    HeldObject = Object;
+    bIsHoldingObject = true;
+    SafePullDistance = Stats->SafePullDistance;
 
 
-
-	float DistanceToObject = FVector::Dist(PlayerCharacter->GetActorLocation(), Object->GetActorLocation());
-	if (DistanceToObject > Stats->SafePullDistance)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Object is too far away! required distance :%f"), Stats->SafePullDistance);
-		UE_LOG(LogTemp, Warning, TEXT("Distance to object : % f"), DistanceToObject);
-		return;
-	}
-
-	if (CurrentStamina < Stats->StaminaCost)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Not enough stamina to grab object!"));
-		return;
-	}
-
-	ConsumeStamina(Stats->StaminaCost);
-
-	HeldObject = Object;
-	bIsHoldingObject = true;
-	SafePullDistance = Stats->SafePullDistance;
-
-	UE_LOG(LogTemp, Log, TEXT("Telekinetic Object Grabbed: %s"), *Object->GetName());
-
-	HoldTelekineticObject();
+    HoldTelekineticObject();
 }
 
 void UTelekinesisComponent::HoldTelekineticObject()

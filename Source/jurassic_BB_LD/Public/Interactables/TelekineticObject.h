@@ -77,13 +77,13 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Telekinesis")
 	ETObjectState ObjectState;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Telekinesis")
+	UPROPERTY(VisibleAnywhere, Category = "Telekinesis")
 	float ThrowSpeed = 50.0f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Telekinesis")
+	UPROPERTY(VisibleAnywhere, Category = "Telekinesis")
 	float LiftSpeed = 2.0f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Telekinesis")
+	UPROPERTY(VisibleAnywhere, Category = "Telekinesis")
 	float MaxPullForce = 5000.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Telekinesis")

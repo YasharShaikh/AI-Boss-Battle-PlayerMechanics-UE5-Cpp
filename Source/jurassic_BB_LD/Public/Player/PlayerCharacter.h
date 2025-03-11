@@ -119,11 +119,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")		float pushForce;
 	UPROPERTY(EditAnywhere, Category = "Player Character | EXO Telekinesis System")		UCurveFloat* DashCurve = nullptr;
 
-	UFUNCTION(BlueprintCallable)	void Telekinesis_Pull();
-	UFUNCTION(BlueprintCallable)	void Telekinesis_Push();
-
 	void ResetExoCharge();
-	void DetectTelekineticObject();
 #pragma endregion
 
 #pragma region Firing System

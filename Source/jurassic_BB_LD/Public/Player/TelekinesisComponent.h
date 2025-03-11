@@ -28,8 +28,8 @@ public:
 	UFUNCTION(BlueprintCallable)	void StartTelekinesis();
 	UFUNCTION(BlueprintCallable)	void HoldTelekineticObject();
 	UFUNCTION(BlueprintCallable)	void ReleaseTelekineticObject();
+	UPROPERTY(BlueprintReadOnly)	ATelekineticObject* HeldObject;
 
-	/** Stamina Handling */
 	void UpdateStamina(float DeltaTime);
 	void ConsumeStamina(float Amount);
 	void RegenerateStamina(float DeltaTime);
@@ -40,8 +40,6 @@ private:
 	APlayerCharacter* PlayerCharacter;
 
 	/** Held Object */
-	UPROPERTY()
-	ATelekineticObject* HeldObject;
 
 	/** Stamina Properties */
 	UPROPERTY(EditDefaultsOnly, Category = "Telekinesis")

@@ -39,11 +39,12 @@ APlayerCharacter::APlayerCharacter()
 	objectHoldPosition = CreateDefaultSubobject<USceneComponent>(TEXT("Object Hold Position"));
 	objectHoldPosition->SetupAttachment(PlayerViewCamera);
 
-
-	tripwireComponent = CreateDefaultSubobject<UTripWireComponent>(TEXT("Trip Wire Component"));
-
 	WeaponSystemComponent = CreateDefaultSubobject<UWeaponSystemComponent>(TEXT("Weapon Component"));
 	TelekinesisComponent = CreateDefaultSubobject<UTelekinesisComponent>(TEXT("Telekinesis Component"));
+	
+	tripwireComponent = CreateDefaultSubobject<UTripWireComponent>(TEXT("Trip Wire Component"));
+
+
 }
 
 // Called when the game starts or when spawned
@@ -66,12 +67,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	SprintMechanic(DeltaTime);
 
-	DetectTelekineticObject();
-	//Detector();
-
-
-
 	HitDetection();
+
+	if (!TelekinesisComponent->IsValidLowLevelFast())
+	{
+		UE_LOG(LogTemp, Error, TEXT("TelekinesisComponent is no longer valid!"));
+	}
 }
 
 // Called to bind functionality to input
@@ -88,7 +89,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	//Action Mapping
 	PlayerInputComponent->BindAction(FName("Sprint"), IE_Pressed, this, &APlayerCharacter::Sprint);
 	PlayerInputComponent->BindAction(FName("Sprint"), IE_Released, this, &APlayerCharacter::StopSprint);
-	
+
 
 	PlayerInputComponent->BindAction(FName("AimDownSight"), IE_Pressed, this, &APlayerCharacter::AimDownSight);
 	PlayerInputComponent->BindAction(FName("AimDownSight"), IE_Released, this, &APlayerCharacter::StopAimDownSights);
@@ -99,12 +100,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAction(FName("Interact"), IE_Pressed, this, &APlayerCharacter::interactPressed);
 	PlayerInputComponent->BindAction(FName("Interact"), IE_Released, this, &APlayerCharacter::interactReleased);
-
-
-
-		PlayerInputComponent->BindAction(FName("Interact"), IE_Pressed, this, &APlayerCharacter::StartTelekinesis);
-		PlayerInputComponent->BindAction(FName("Interact"), IE_Released, this, &APlayerCharacter::ReleaseTelekineticObject);
-
 
 }
 
@@ -198,104 +193,6 @@ void APlayerCharacter::interactReleased()
 }
 
 
-#pragma region Telekenisis
-
-
-
-
-//TODO: turn this into single common function for detection 
-void APlayerCharacter::DetectTelekineticObject()
-{
-
-	FVector CameraLocation;
-	FRotator CameraRotation;
-	GetActorEyesViewPoint(CameraLocation, CameraRotation);
-
-	FVector startLocation = CameraLocation;
-	FVector endLocation = startLocation + CameraRotation.Vector() * maxPickRange;
-
-	FHitResult hitResult;
-	FCollisionQueryParams queryParams;
-	queryParams.AddIgnoredActor(this);
-	FCollisionShape Sphere = FCollisionShape::MakeSphere(maxPickRange);
-
-	if (!bUsingTelekenisis)
-	{
-		bool bHasHit = GetWorld()->LineTraceSingleByChannel(hitResult, startLocation, endLocation, ECC_Visibility, queryParams);
-		if (bHasHit)
-		{
-
-			AActor* hitActor = hitResult.GetActor();
-			if (IInteractInterface* iinteractInterface = Cast<IInteractInterface>(hitResult.GetActor()))
-			{
-
-				if (ADamageInflictingObject* damageInflictingObject = Cast<ADamageInflictingObject>(hitResult.GetActor()))
-				{
-					bIsDamageInflictingObject = true;
-					if (storeDamageInflictingObject && storeDamageInflictingObject != damageInflictingObject)
-					{
-						storeDamageInflictingObject->EnterState(EObjectStates::EOS_NONE);
-					}
-					storeDamageInflictingObject = damageInflictingObject;
-					storeDamageInflictingObject->EnterState(EObjectStates::EOS_HIGHLIGHT);
-				}
-				else if (storeDamageInflictingObject)
-				{
-					bIsDamageInflictingObject = false;
-					storeDamageInflictingObject->EnterState(EObjectStates::EOS_NONE);
-					storeDamageInflictingObject = nullptr;
-				}
-				if (AInteractableForPlacement* interactableForPlacement = Cast<AInteractableForPlacement>(hitResult.GetActor()))
-				{
-					bIsInteractableForPlacement = true;
-					storeInteractableForPlacement = interactableForPlacement;
-				}
-				else
-				{
-					bIsInteractableForPlacement = false;
-					storeInteractableForPlacement = nullptr;
-				}
-
-
-			}
-
-		}
-
-	}
-
-}
-
-
-void APlayerCharacter::Telekinesis_Pull()
-{
-	if (storeDamageInflictingObject)
-	{
-
-		bUsingTelekenisis = true;
-		storeDamageInflictingObject->EnterState(EObjectStates::EOS_PULL);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No object to pull"));
-	}
-
-}
-
-void APlayerCharacter::Telekinesis_Push()
-{
-	if (storeDamageInflictingObject)
-	{
-		storeDamageInflictingObject->EnterState(EObjectStates::EOS_PUSH);
-		storeDamageInflictingObject = nullptr;
-		bUsingTelekenisis = false;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No object to pull"));
-	}
-
-}
-#pragma endregion
 
 
 #pragma region Weapon System
@@ -358,28 +255,19 @@ void APlayerCharacter::StartTelekinesis()
 {
 	if (TelekinesisComponent)
 	{
-		UE_LOG(LogTemp, Error, TEXT("StartTelekinesis From Player CHaracter"));
 		TelekinesisComponent->StartTelekinesis();
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("StartTelekinesis From Player CHaracter, NOT FOUND"));
+		UE_LOG(LogTemp, Error, TEXT("TelekinesisComponent is NULL in StartTelekinesis()"));
 	}
 }
 
 void APlayerCharacter::ReleaseTelekineticObject()
 {
 	if (TelekinesisComponent)
-	{
-		UE_LOG(LogTemp, Error, TEXT("ReleaseTelekineticObject From Player CHaracter"));
 		TelekinesisComponent->ReleaseTelekineticObject();
-	}
-	else
-	{
 
-		UE_LOG(LogTemp, Error, TEXT("ReleaseTelekineticObject From Player CHaracter,, NOT FOUND"));
-
-	}
 }
 
 
