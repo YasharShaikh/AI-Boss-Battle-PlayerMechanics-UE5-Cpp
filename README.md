@@ -20,7 +20,7 @@ A project that implements AI-driven boss battle mechanics using Unreal Engine 5 
 ----------
 💡**Objective**: Build an immersive boss battle that dynamically challenges the player through smart AI and reactive player controls.
 
-![Player Mechanic 1](https://github.com/user-attachments/assets/7f1785d5-83ee-4337-87fc-18a82817a31c)
+![Player Mechanic 1](https://github.com/user-attachments/assets/c6f57af7-c78e-4e3c-a8a5-bc1101fe707e)
 
 
 **Gameplay 🎮**
