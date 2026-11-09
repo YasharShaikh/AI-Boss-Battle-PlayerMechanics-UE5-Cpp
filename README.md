@@ -1,68 +1,21 @@
-**AI-Boss-Battle-PlayerMechanics-UE5-Cpp 🦖**
-==========================
+# AI Boss Battle & Player Mechanics
 
-A project that implements AI-driven boss battle mechanics using Unreal Engine 5 (UE5) with C++, incorporating dynamic player mechanics, combat interactions, and AI behavior systems.
+A desktop Unreal Engine 5.3 prototype built around a T. rex boss encounter. The C++ project separates boss states, player abilities, weapon logic, and interactables so each system can be explored independently.
 
-* AI Boss Battle System
-  - State-driven AI with behavior trees and decision-making logic.
-  - Menace Gauge, Fatigue Gauge, and Rage Gauge systems for dynamic boss behavior.
-* Player Mechanics
-  - Responsive movement, attack combos, and evasion with dodge and dash abilities.
-* Procedural AI State Machine
-  - Modular state machine controlling AI transitions and attack types.
-* Material and Texture Management
-  - Utilizes Unity's materials to dynamically apply textures and colors based on elevation and biome settings.
- * Combat Dynamics
-  - Adaptive AI responses based on distance, player actions, and boss state.
+![Boss battle prototype preview](https://github.com/user-attachments/assets/c6f57af7-c78e-4e3c-a8a5-bc1101fe707e)
 
+## Code tour
 
-**Preview 👀**
-----------
-💡**Objective**: Build an immersive boss battle that dynamically challenges the player through smart AI and reactive player controls.
+| System | Where to look |
+| --- | --- |
+| Boss behavior | [EnemyAI](Source/jurassic_BB_LD/Private/EnemyAI) contains the T. rex controller, state component factory, and individual attack, defense, hunt, exhaust, rage, and stun states. |
+| Player abilities | [Player](Source/jurassic_BB_LD/Private/Player) includes the player character, dash, telekinesis, and tripwire components. |
+| Equipment and interaction | [Weapon](Source/jurassic_BB_LD/Private/Weapon) and [Interactables](Source/jurassic_BB_LD/Private/Interactables) contain firearms, magazines, pickups, and objects used by the abilities. |
 
-![Player Mechanic 1](https://github.com/user-attachments/assets/c6f57af7-c78e-4e3c-a8a5-bc1101fe707e)
+## Open the encounter
 
+1. Clone the repository with Git LFS available for Unreal assets.
+2. Open [jurassic_BB_LD.uproject](jurassic_BB_LD.uproject) with **Unreal Engine 5.3**. On Windows, install the Visual Studio C++ game development tools and build the editor target if prompted.
+3. Open **Content → MainGame → Maps → TestLevel** and press **Play**. This is the configured editor startup map.
 
-**Gameplay 🎮**
-------------
-* Face an evolving boss that adapts based on gauges and player actions.
-* Utilize various player abilities such as telekinesis, firearms, and exploite weakness.
-  
-
-**Getting Started 📃**
---------------
-* Unreal Engine Version: 5.3 or higher.
-* Basic knowledge of Unreal Engine C++ and Blueprint systems.
-
-**Building**
---------------
-* Clone this repository
-* Open jurassic_BB_LD.uproject in Unreal Engine.
-* Build and compile the solution from Visual Studio.
-* Launch the project and play the Main Level to test the boss battle.
-
-**Core Components 🛠️**
---------------
-**C++ Classes**
-*  BossAIController: Governs AI decision-making and transitions.
-*  PlayerController: Manages player input, abilities, and movement.
-*  StateMachine: Handles AI state transitions and behavior logic.
-
-
-**Blueprints**
-*  BP_BossCharacter: Defines boss behavior and visual state changes.
-*  BP_PlayerCharacter: Manages player actions and special abilities.
-  
-**Contributing 💪**
---------------
-Looking to contribute something to this project? Here's how you can help.
-
-If you believe something needs to be immediately fixed please open an issue and document the problem. 
-Fork this project and create a pull request with your solution to the problem. Thank you.
-
-**Reach Out? 💬**
-----------
-
-* Yashar Shaikh (yashrsk6@gmail.com)
-* [Github](https://github.com/YasharShaikh)
-* [Linkdin](https://www.linkedin.com/in/yashar-shaikh/)
+See [LICENSE](LICENSE) for the repository license.
